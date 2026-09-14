@@ -6,7 +6,7 @@ date: "Septembre 2026"
 
 > Source de contenu du deck `livrables/04-presentation-executive.pptx` (généré par `generate_pptx.py`). 9 slides principales + slide « Annexes » + 3 slides de Q&A en annexe. Les notes orateur ci-dessous sont intégrées dans le fichier PowerPoint.
 
-**Format** : 9 slides · 15 minutes + 10 minutes de Q&A (à adapter au format de soutenance Jedha).
+**Format** : 9 slides · **15 minutes de présentation + 15 minutes de questions** (format Jedha).
 
 | # | Slide | Visuel | Temps |
 |---|---|---|---|
