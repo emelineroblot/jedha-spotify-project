@@ -1,137 +1,51 @@
-# Étape 2 — Organigramme des Rôles : Spotify Data Governance
-
-**Auteur** : Data Governance Specialist  
-**Date** : Mai 2026  
-**Version** : 2.0 (mise à jour sur base du Business Case officiel)
-
+---
+title: "Organisation & Rôles — Spotify Data Governance"
+author: "Emeline ROBLOT — Data Governance Specialist"
+date: "Septembre 2026"
 ---
 
-## Organigramme
+> Livrable PowerPoint (2 slides) : `livrables/02-organigramme-roles.pptx`, généré par `generate_pptx.py`. Ce fichier est la source de contenu.
+
+## Slide 1 — Organigramme (modèle Centre of Excellence)
 
 ```
-                            ┌─────────────────┐
-                            │      CEO        │
-                            └───────┬─────────┘
-                                    │
-          ┌─────────────────────────┼──────────────────────────┐
-          │                         │                          │
- ┌────────▼────────┐      ┌─────────▼──────┐        ┌─────────▼──────┐
- │  Chief Data     │      │     Data       │        │   Legal Team   │
- │  Officer (CDO)  │      │  Protection    │        │                │
- │                 │      │ Officer (DPO)  │        │                │
- └────────┬────────┘      └────────────────┘        └────────────────┘
-          │
-  ┌───────┴────────────────────────────────────┐
-  │          Data Governance CoE               │
-  │   (Centre of Excellence — standards,       │
-  │    catalogue, qualité, formation)          │
-  └──┬──────┬──────┬──────┬──────┬─────────────┘
-     │      │      │      │      │
- ┌───▼──┐ ┌─▼────┐ ┌▼────┐ ┌▼───┐ ┌▼──────────┐
- │Data  │ │Data  │ │Data │ │Data│ │Data       │
- │Stew. │ │Stew. │ │Stew.│ │St. │ │Steward    │
- │USER  │ │CONT. │ │PAY. │ │ADS │ │MARKETING  │
- └──────┘ └──────┘ └─────┘ └────┘ └───────────┘
-     │         │       │      │         │
-     └─────────┴───────┴──────┴─────────┘
-                        │
-         ┌──────────────▼──────────────┐
-         │      Head of Engineering    │
-         │   (infrastructure, pipelines│
-         │    sécurité, scalabilité)   │
-         └──────────────┬──────────────┘
-                        │
-         ┌──────────────▼──────────────┐
-         │       Data Engineers        │
-         │  (implémentation technique, │
-         │   Great Expectations, GCP)  │
-         └─────────────────────────────┘
+                                   CEO
+          ┌──────────────────┬──────┴───────┬──────────────────┐
+         CDO                DPO            CTO               Legal
+   (stratégie data,    (indépendant,   (technologie)     (validation
+    pilote le CoE)     conformité)          │             juridique)
+          │                 │               │
+   Data Governance     Privacy Team    Head of Engineering
+   CoE (4-6 pers.)     (2 analystes)        │
+          │                             Data Engineers
+   ┌──────┼──────┬──────┬──────┐   (implémentent les contrôles)
+ Steward Steward Steward Steward Steward
+  USER   CONTENT  PAY.   ADS   MKTG
+   └── chacun rattaché fonctionnellement à sa business unit ──┘
 
- Autres parties prenantes transversales :
- ┌──────────────────┐    ┌────────────────────┐
- │ Marketing        │    │ Product Managers   │
- │ Director         │    │ (conformité des    │
- │ (données campag. │    │  nouvelles         │
- │  conformité ads) │    │  fonctionnalités)  │
- └──────────────────┘    └────────────────────┘
+ Transverse : Data Governance Committee (mensuel, présidé par le CDO)
+ Parties prenantes : Marketing Director · Product Managers · Department Heads
 ```
 
----
+**Principe de séparation (cours Jedha)** : la **gouvernance** (CDO, CoE, stewards) définit les standards et audite ; le **data management** (CTO, Head of Engineering, Data Engineers) implémente. Deux lignes hiérarchiques distinctes, une collaboration formalisée par le RACI. Le DPO est hors de la ligne du CDO pour garantir son indépendance (GDPR art. 38).
 
-## Fiches synthétiques
+## Slide 2 — Fiches de rôle (Data Governance Roles Template)
 
-| Rôle | Rattachement | Périmètre | Responsabilité governance |
+| Rôle | Rattachement | Responsabilité principale | Tâches clés |
 |---|---|---|---|
-| **CDO** | CEO | Stratégie data globale | Définit la politique, arbitre les conflits, pilote le CoE |
-| **DPO** | Board (indépendant) | Conformité GDPR/CCPA/PDPA | DPIAs, audits, point de contact CNIL et autorités |
-| **Legal Team** | CEO | Conformité juridique globale | Valide les politiques, gère les risques légaux et litiges data |
-| **Head of Engineering** | CDO | Infrastructure data | Scalabilité, sécurité, implémentation technique des contrôles |
-| **Marketing Director** | CDO / CMO | Données campagnes & segmentation | Conformité des pratiques marketing, qualité des données ads |
-| **Product Managers** | Head of Product | Données produit | Conformité des nouvelles features, qualité des données produit |
-| **Data Governance CoE** | CDO | Standards, catalogue, formation | Maintient le catalogue Collibra, les standards, forme les équipes |
-| **Data Steward — User Data** | CoE + BU Users | Comportements d'écoute, profils | Ownership qualité, règles Great Expectations, pipeline GDPR |
-| **Data Steward — Content** | CoE + BU Content | Métadonnées musicales & podcasts | Qualité ISRC, cohérence métadonnées labels |
-| **Data Steward — Payments** | CoE + Finance | Transactions, facturation | Conformité PCI-DSS, audit annuel |
-| **Data Steward — Ads** | CoE + BU Ads | Ciblage, impressions, conversions | Conformité CCPA opt-out, qualité segments |
-| **Data Steward — Marketing** | CoE + Marketing | Campagnes, segmentation, conversion | Cohérence métriques, conformité données marketing |
-| **Data Engineers** | Head of Engineering | Pipelines GCP, Airflow | Implémentation Great Expectations, pseudonymisation, chiffrement |
+| **Chief Data Officer** | CEO | Diriger la stratégie et la gouvernance des données | Définir les politiques ; arbitrer les conflits inter-domaines ; piloter le CoE et le Committee ; aligner avec les priorités business ; rendre compte au comité exécutif |
+| **Data Protection Officer** | CEO (indépendant) | Garantir la conformité GDPR, CCPA et réglementations locales | Registre des traitements ; DPIA ; contact des autorités ; pilotage des incidents et notification 72 h ; direction de la Privacy Team ; veille réglementaire avec Legal |
+| **Data Governance Committee** | Présidé par le CDO | Guider le framework et assurer l'alignement transverse | Approuver politiques et standards ; traiter les sujets inter-départements ; suivre les KPIs ; valider les Go/No-Go du plan |
+| **Data Steward** (×5 : User, Content, Payments, Ads, Marketing) | CoE + business unit | Superviser les pratiques data de son domaine | Qualité, classification et durées de conservation ; accorder et revoir les accès ; alimenter le catalogue ; faire appliquer la politique ; reporting mensuel |
 
----
+**Parties prenantes** (business case) :
 
-## Privacy Team dédiée
-
-Conformément aux recommandations du business case, une **Privacy Team** est rattachée au DPO :
-
-| Membre | Rôle |
+| Rôle | Contribution à la gouvernance |
 |---|---|
-| DPO | Responsable de la Privacy Team |
-| Privacy Analysts (x2) | Traitement des demandes utilisateurs (GDPR/CCPA) |
-| Data Stewards concernés | Support sur les domaines impliqués |
+| Head of Engineering (sous le CTO) | Implémentation technique : pipelines, chiffrement, SIEM, pipeline d'effacement, scalabilité |
+| Legal Team | Validation juridique des politiques, contrats fournisseurs, litiges |
+| Marketing Director | Conformité des campagnes (consentement, opt-out), qualité des données marketing |
+| Product Managers | Privacy by design, DPIA sur chaque nouvelle feature, qualité des données produit |
+| Privacy Team (DPO + 2 analystes) | Traitement des demandes des personnes dans les délais légaux (1 mois GDPR, 45 j CCPA) |
 
-**Volume estimé** : Spotify reçoit des milliers de demandes d'effacement et d'accès par mois à l'échelle mondiale — la Privacy Team garantit le respect des délais légaux (30j pour effacement, 45j pour accès CCPA, 72h pour notification de violation).
-
----
-
-## Interactions clés
-
-```
-CDO ──────────────────► Définit politique, arbitre conflits cross-domaines
- │
- └──► CoE ────────────► Maintient le catalogue Collibra, les standards et la formation
-       │
-       └──► Stewards ──► Garantissent qualité et conformité dans leur domaine
-             │
-             └──► Head of Engineering ► Implémente les contrôles dans les pipelines
-
-DPO ──────────────────► Valide tous nouveaux traitements (DPIA obligatoire)
- │                       Point de contact CNIL/autorités — 72h breach notification
- ├──► Legal ───────────► Base légale, contrats fournisseurs data, litiges
- └──► Privacy Team ───► Demandes utilisateurs GDPR/CCPA, conformité continue
-
-Marketing Director ───► Garantit que les campagnes respectent CCPA/GDPR
-Product Managers ─────► S'assurent que chaque nouvelle feature est privacy-by-design
-```
-
----
-
-## Data Governance Committee
-
-Réunion mensuelle présidée par le CDO :
-
-| Participant | Rôle dans le comité |
-|---|---|
-| CDO | Président |
-| DPO | Conformité & risques réglementaires |
-| Head of Engineering | Avancement technique & incidents |
-| Marketing Director | Reporting qualité données marketing |
-| Legal Team | Veille réglementaire (GDPR, AI Act, etc.) |
-| Data Stewards (x5) | Reporting qualité par domaine |
-| Product Managers (représentant) | Nouvelles features à valider |
-
-**Ordre du jour type** :
-1. Métriques qualité par domaine — Great Expectations (10 min)
-2. Incidents data et violations du mois (10 min)
-3. Nouveaux traitements à valider (DPIAs) (15 min)
-4. Avancement plan d'implémentation (10 min)
-5. Audits algorithmes / biais IA (10 min)
-6. Décisions & arbitrages (5 min)
+**Data Governance Committee — composition et ordre du jour type (mensuel, 60 min)** : CDO (président), DPO, Head of Engineering, Marketing Director, Legal, 5 Data Stewards, 1 représentant Product. Ordre du jour : KPIs qualité par domaine · incidents et demandes des personnes · nouveaux traitements / DPIA · avancement du plan · audits de biais · décisions.

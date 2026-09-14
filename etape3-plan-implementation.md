@@ -1,261 +1,132 @@
-# Étape 3 — Plan d'Implémentation : Spotify Data Governance
-
-**Auteur** : Data Governance Specialist  
-**Date** : Mai 2026  
-**Version** : 3.0 (intégration Pilot Implementation Template + Tech Tools Overview officiels)
-
+---
+title: "Implementation Plan — Spotify"
+subtitle: "Plan de déploiement du framework et pilote User Data"
+author: "Emeline ROBLOT — Data Governance Specialist"
+date: "Septembre 2026"
 ---
 
-## 1. Modèle organisationnel retenu : Centre of Excellence (CoE)
+## 1. Modèle organisationnel : Centre of Excellence (CoE)
 
-Recommandation confirmée par l'Executive Q&A Guide officiel (Q5) :
+| Modèle (Organizational Models Overview) | Avantages | Failles | Verdict pour Spotify |
+|------------------|------------------------|--------------------------|------------------------------|
+| **Centralisé** | Simple, priorisation claire | Les métiers ne s'approprient pas la donnée ; goulot d'étranglement | Non : 180+ pays, squads autonomes |
+| **Embedded** | Agile, proche du métier | Pas de source unique de vérité, silos | Non : c'est le modèle de fait actuel, il produit les silos constatés |
+| **Centre of Excellence** | Cumule les deux ; standards communs + relais dans chaque BU | Réservé aux grandes entreprises ; couche de coordination supplémentaire | **Oui** : Spotify est une grande entreprise ; la coordination est assurée par le Committee mensuel |
 
-> *"Le CoE équilibre une gouvernance centralisée forte avec la flexibilité pour chaque département de gérer ses besoins data spécifiques. Cette approche hybride assure la cohérence des principes de gouvernance tout en permettant aux équipes de s'adapter à leurs challenges data propres. C'est le meilleur modèle pour la structure globale et diverse de Spotify."*
+Le CoE (4-6 personnes sous le CDO) porte les standards, le catalogue, la formation et l'audit ; les 5 Data Stewards sont les relais dans les business units. Conformément au cours, **gouvernance et data management sont séparés** : le CoE définit et audite, l'engineering (CTO) implémente.
 
-| Modèle | Adapté à Spotify ? | Raison |
-|---|---|---|
-| Centralisé | Non | Trop rigide pour 180+ pays et squads autonomes |
-| Décentralisé | Non | Renforce les 5 silos identifiés dans l'assessment |
-| **CoE** | **Oui** | Équilibre gouvernance et vélocité — validé par l'Executive Q&A Guide |
+## 2. Stack technologique
 
----
+Un outil par besoin, choisi dans le Tech Tools Overview selon trois critères : intégration avec l'existant GCP/Airflow, coût, couverture fonctionnelle. Spotify dispose déjà d'un catalogue interne (Lexikon) : la phase 1 audite l'existant avant tout achat.
 
-## 2. Stack technologique officielle (Tech Tools Overview)
+| Besoin | Outil retenu | Pourquoi | Alternative évaluée |
+|------------------|------------------------|----------------------------------------|------------------|
+| Catalogue & stewardship | **Collibra** (ou extension de Lexikon) | Workflows de stewardship, glossaire, classification, intégration BigQuery | Alation, Apache Atlas |
+| Qualité des données | **Great Expectations** | Open source, tests dans les pipelines Airflow existants, coût nul en licence | Talend |
+| Conformité & consentement | **OneTrust** | Consentement multi-pays, registre, DPIA, gestion des demandes des personnes | TrustArc |
+| Sécurité (SIEM) | **Splunk** | Journalisation centralisée, détection d'incidents | DataGuard |
+| Chiffrement & clés | **Vormetric (Thales CipherTrust)** | Chiffrement des données sensibles au repos, gestion des clés | — |
+| Lineage | **OpenLineage + Marquez** | Standard ouvert compatible Airflow, traçabilité de bout en bout | — |
+| Observabilité (phase 4) | **Monte Carlo** | Détection d'anomalies et de fraîcheur | Ataccama ONE |
 
-### Data Cataloging
+## 3. Plan en 4 phases (18 mois)
 
-| Outil | Usage | Statut |
-|---|---|---|
-| **Collibra** | Data stewardship, catalogue, qualité — interface métier | **Retenu** (priorité) |
-| **Alation** | Data discovery, collaboration | Alternative budget |
-| **Apache Atlas** | Open source, metadata management | Backup open source |
+Calendrier conforme à l'Executive Q&A Guide : pilote de 3 à 6 mois, puis 12 mois de déploiement.
 
-### Data Quality
+![](assets/gantt-plan.png){width=15cm}
 
-| Outil | Usage | Statut |
-|---|---|---|
-| **Talend** | Data integration, cleansing, déduplication, conformité | **Retenu** (principal) |
-| **Informatica Data Quality** | Profiling, cleansing, matching temps réel | Complémentaire — domaine Content |
-| **Ataccama ONE** | AI-powered profiling, gouvernance automatisée | Phase 4 |
-| **Great Expectations** | Tests CI/CD dans Airflow (open source) | Intégration immédiate |
+**Phase 1 — Fondations (M1-M2).** Prérequis bloquant : nomination du CDO. Puis : constitution du CoE et désignation des 5 Data Stewards (fiches signées) ; confirmation du DPO et création de la Privacy Team ; approbation de la politique v1.0 par le Committee ; audit de l'existant (Lexikon, pipelines, consentement) ; déploiement OneTrust et instance pilote du catalogue ; cartographie des flux User Data ; communication de lancement (message CEO, webinar CDO, FAQ par rôle) et e-learning obligatoire. *Critère de sortie* : équipe en place, politique approuvée, baseline de mesure prête.
 
-### Compliance Monitoring
+**Phase 2 — Pilote User Data (M3-M6).** Voir section 4. *Critère de sortie* : Go/No-Go du Committee sur les KPIs.
 
-| Outil | Usage | Statut |
-|---|---|---|
-| **OneTrust** | Consentements (180 pays), data mapping, DPIAs, reporting | **Retenu** |
-| **TrustArc** | Inventory, consent management complémentaire | Optionnel |
-| **VeraSafe** | Audits GDPR/CCPA, gestion d'incidents | Phase 3 |
+**Phase 3 — Généralisation (M7-M12).** Déploiement domaine par domaine, dans l'ordre de priorité du business case : **Content** (métadonnées, royalties), **Marketing** (consentement, métriques de conversion), **Payments** (PCI-DSS, chiffrement), **Ads** (opt-out CCPA/CPRA). Pour chaque domaine : cartographie → classification et durées de conservation → règles qualité dans les pipelines → DPIA si nécessaire → baseline puis cibles. Extension du pilote User Data des marchés UE au monde. *Critère de sortie* : 5 domaines catalogués et mesurés.
 
-### Data Security
+**Phase 4 — Industrialisation (M13-M18).** Observabilité (Monte Carlo), lineage de bout en bout, audit de conformité complet (GDPR/CCPA/PCI-DSS) et audit complet des biais de recommandation, formation avancée par rôle, tableau de bord exécutif, revue annuelle de la politique (v2.0). *Critère de sortie* : mode opérationnel continu, score de maturité ≥ 4,2.
 
-| Outil | Usage | Statut |
-|---|---|---|
-| **Splunk** | SIEM — visibilité temps réel sécurité | **Retenu** |
-| **DataGuard** | Automation protection données, reporting GDPR/CCPA | Complémentaire |
-| **Vormetric** | Chiffrement données sensibles (BDD, fichiers, apps) | **Retenu** |
+## 4. Pilote User Data (Pilot Implementation Template)
 
-### Data Lineage & Orchestration
+| | |
+|----------------|--------------------------------------------------------------------------------|
+| **Projet** | Pilote du framework de Data Governance — domaine User Data |
+| **Période** | M3 → M6 (4 mois) |
+| **Préparé par** | Emeline ROBLOT, Data Governance Specialist |
+| **Project Manager** | Lead du Data Governance CoE |
+| **Sponsor** | CDO |
 
-| Outil | Usage | Statut |
-|---|---|---|
-| **OpenLineage + Marquez** | Traçabilité end-to-end, compatible Airflow | **Retenu** |
-| **Apache Airflow** | Orchestration — déjà en production chez Spotify | Existant |
-| **Monte Carlo** | Data observability, alertes anomalies | Phase 4 |
-| **GCP** | Infrastructure cloud — déjà en production | Existant |
+**Objectif et périmètre.** Tester le framework complet (politique, rôles, outils, KPIs) sur le domaine le plus sensible et le plus créateur de valeur : les données utilisateurs. Périmètre borné pour être réaliste en 4 mois : **profils et historiques d'écoute des marchés UE** (juridiction la plus exigeante, sanction IMY 2023), extension mondiale en phase 3. Pourquoi User Data : exposition GDPR maximale, données pouvant révéler des informations sensibles inférées, impact direct sur Discover Weekly et la rétention premium.
 
----
+**Key goals (template).** (1) Qualité : complétude et cohérence des données utilisateurs ; (2) Conformité GDPR/CCPA : droits des personnes et consentement ; (3) Accès et intégration : réduire les silos entre Product, Marketing et Engineering ; (4) Risque : classification, chiffrement, protocole d'incident testé.
 
-## 3. Plan d'implémentation — 4 phases
+**Équipe.**
 
-### Phase 1 — Fondations organisationnelles (M1-M2)
+| Rôle | Responsabilités |
+|----------------------------------|--------------------------------------------------------------|
+| Pilot Project Manager (Lead CoE) | Pilotage, coordination, reporting au Committee |
+| Data Steward User | Qualité, classification, règles Great Expectations, catalogue |
+| DPO + Privacy Team | Audit de conformité, DPIA, test du pipeline de droits |
+| Data Engineers (Head of Engineering) | Intégration outils, pipeline d'effacement, pseudonymisation |
+| Department Head (VP Product / User Experience) | Alignement métier, arbitrage des priorités, adoption |
 
-**Objectif** : mettre en place les conditions humaines, organisationnelles et techniques.
+**Jalons.**
 
-**Communication & change management (démarrage immédiat)**
+| Jalon | Date | Responsable |
+|----------------------------------------------------|----------------|----------------------------|
+| Kick-off et mesure des baselines | M3 s1 | Project Manager |
+| Data assessment et cleansing (périmètre UE) | M3 s2 → M4 s2 | Data Steward User |
+| Audit de conformité GDPR/CCPA et DPIA | M4 | DPO |
+| Setup technique : catalogue, Great Expectations, pipeline d'effacement | M4 → M5 s2 | Data Engineers |
+| Revue à mi-parcours et ajustements | M5 s2 | Project Manager |
+| Premier audit des biais de recommandation | M5 s3-4 | Head of Engineering + DPO |
+| Revue finale, lessons learned, Go/No-Go | M6 s4 | Project Manager → Committee |
 
-Avant toute action technique, lancer la communication interne :
-- Message CEO annonçant le programme
-- Webinar CDO pour tous les départements
-- FAQ interne par rôle (Marketing, Engineering, Product, Legal)
+**Livrables** : Data Quality Report · Compliance Assessment · Technical Integration Plan · Risk Assessment Report · Stakeholder Feedback.
 
-| Action | Responsable | Livrable |
-|---|---|---|
-| Nommer le CDO | CEO | Nomination officielle communiquée |
-| Constituer le CoE (4-6 personnes) | CDO | Équipe opérationnelle |
-| Désigner les 5 Data Stewards | CDO | Fiches de rôle signées |
-| Confirmer/nommer le DPO | Board | Nomination + enregistrement autorités |
-| Constituer la Privacy Team (DPO + 2 analystes) | DPO | Équipe pour demandes GDPR/CCPA |
-| Déployer OneTrust — consentements 180 pays | DPO + Engineering | Gestion consentements active |
-| Déployer Collibra — instance pilote | Head of Engineering | Catalogue prêt pour User Data |
-| Déployer Splunk — SIEM | Head of Engineering | Visibilité sécurité centralisée |
-| Cartographie initiale des flux data | Data Stewards | Data map par domaine |
-| Formation initiale tous employés | CoE + DPO | E-learning sur principes GDPR + qualité |
+**KPIs.** Toutes les baselines sont mesurées en M3 semaine 1.
 
-**Critères de succès phase 1** : CoE + Privacy Team opérationnels, OneTrust actif, Collibra déployé.
+| KPI | Définition | Baseline | Cible M6 | Source |
+|----------------|----------------------------------------|----------|--------------------------|--------------|
+| Data Quality Score | % de champs obligatoires manquants sur les datasets critiques User | à mesurer | **-10 %** de données manquantes (complétude > 98 %) | Great Expectations |
+| Compliance Score | % de traitements User avec base légale documentée et consentement valide quand requis | à mesurer | **100 %** | OneTrust |
+| Data Access Speed | Délai médian entre demande d'accès à un dataset et accès effectif | à mesurer | **-20 %** | Catalogue |
+| Risk Mitigation Score | Datasets User classifiés et chiffrés selon leur classe ; incidents | à mesurer | 100 % classifiés, **0 incident** | Catalogue, Splunk |
+| Droits des personnes | Délai de traitement d'une demande d'effacement / d'accès | à mesurer | **< 30 jours**, 100 % dans le délai légal | Privacy Team |
 
----
+**Risques du pilote.**
 
-### Phase 2 — Pilote User Data (M3-M4)
+| Risque | Prob. | Impact | Mitigation |
+|----------------------------------|---------|---------|--------------------------------------------|
+| Non-conformité résiduelle GDPR/CCPA | Moyenne | Élevé | Audit DPO en M4, formation, DPIA avant toute mise en production |
+| Résistance au changement des squads | Élevée | Moyen | Ateliers dès M1, stewards issus des équipes, quick wins publiés |
+| Qualité non améliorée | Faible | Élevé | Monitoring continu, revue à mi-parcours |
+| Intégration technique (catalogue ↔ BigQuery, pipeline d'effacement) | Moyenne | Élevé | Engineering impliqué dès M1, POC en phase 1 |
+| Périmètre qui dérive | Moyenne | Moyen | Périmètre UE borné, changements validés par le Committee |
 
-**Objectif** : valider le framework complet sur le domaine le plus sensible.  
-*(Basé sur le Pilot Implementation Template officiel)*
+**Formation et conduite du changement.** Ateliers pratiques pour les équipes User Data (catalogue, règles qualité, droits des personnes) ; documentation et helpdesk du CoE ; canal de feedback hebdomadaire → ajustements ; résultats du pilote publiés en interne comme quick wins.
 
-#### Vue d'ensemble du pilote
+**Évaluation et lessons learned.** Go/No-Go en M6 sur les KPIs ; rapport de retour d'expérience (ce qui a marché, blocages, temps réel vs estimé) ; feedback structuré des stakeholders ; ajustement de la politique et du plan de généralisation avant la phase 3.
 
-**Périmètre** : User Data (historiques d'écoute, profils, comportements — 450M utilisateurs)  
-**Raison** : données les plus exposées au GDPR (4% du CA mondial en cas d'incident) + impact direct sur Discover Weekly et Daily Mix
-
-#### Équipe pilote
-
-| Rôle | Responsabilité |
-|---|---|
-| **Pilot Project Manager** (CDO) | Supervise le pilote, coordonne les parties prenantes |
-| **Data Steward User** | Qualité des données, gouvernance du domaine User |
-| **DPO** | Conformité GDPR/CCPA, conduite des DPIAs |
-| **IT Engineer / Data Engineer** | Outils techniques, pipelines sécurisés |
-| **Head of Engineering** | Oversight technique, scalabilité |
-
-#### Jalons du pilote
-
-| Jalon | Date cible | Responsable |
-|---|---|---|
-| Kick-off meeting | M3 semaine 1 | Project Manager |
-| Data assessment & cleansing (Talend) | M3 semaine 2-3 | Data Steward User |
-| GDPR/CCPA compliance audit | M3 semaine 3-4 | DPO |
-| Technical setup & data integration (Collibra + Great Exp.) | M4 semaine 1-2 | IT Engineer |
-| Mid-project review & adjustments | M4 semaine 2 | Project Manager |
-| Audit biais algorithmiques v1 | M4 semaine 3 | Head of Engineering + DPO |
-| Final review & pilot closure | M4 semaine 4 | Project Manager |
-
-#### Livrables du pilote
-
-1. **Data Quality Report** : amélioration qualité mesurée sur User Data
-2. **Compliance Assessment** : conformité GDPR/CCPA du domaine
-3. **Technical Integration Plan** : documentation de l'intégration data
-4. **Risk Assessment Report** : risques identifiés et mitigations
-5. **Stakeholder Feedback** : retours équipes sur le framework
-
-#### KPIs du pilote (Pilot Template officiel)
-
-| KPI | Cible mesurable | Méthode |
-|---|---|---|
-| **Data Quality Score** | -10% de données manquantes (complétude >98%) | Great Expectations / Talend |
-| **Compliance Score** | 100% de consentements utilisateurs valides | OneTrust |
-| **Data Access Speed** | +20% d'amélioration du temps d'accès aux données | Mesure avant/après Collibra |
-| **Risk Mitigation Score** | 0 brèche de sécurité identifiée pendant le pilote | Splunk |
-| **Pipeline GDPR** | Délai effacement <30 jours opérationnel | Test end-to-end |
-| **Audit biais algorithmiques** | 0 biais critique sur Discover Weekly | Rapport DPO |
-
-#### Gestion des risques du pilote
-
-| Risque | Probabilité | Impact | Mitigation |
-|---|---|---|---|
-| Non-conformité GDPR/CCPA | Moyenne | **Élevé** | Audits réguliers DPO, formation conformité |
-| Résistance au changement | **Élevée** | Moyen | Ateliers change management, feedback précoce |
-| Problèmes qualité non résolus | Faible | **Élevé** | Monitoring Talend continu, revues régulières |
-| Échecs d'intégration technique | Moyenne | **Élevé** | Implication IT dès M1, tests de compatibilité |
-
-#### Training & Change Management (pilote)
-
-- **Training Sessions** : ateliers pour les équipes User Data sur les nouveaux processus de gouvernance
-- **Support Resources** : documentation, tutoriels en ligne, helpdesk dédié pendant le pilote
-- **Feedback Mechanism** : système de remontée des difficultés → ajustements par le CoE
-
-**Go/No-Go M4** : présentation des résultats au Governance Committee pour validation avant phase 3.
-
----
-
-### Phase 3 — Généralisation (M5-M8)
-
-**Objectif** : déployer le framework sur les 4 domaines restants.
-
-| Domaine | Priorité | Spécificité | Outils clés |
-|---|---|---|---|
-| **Content** | Haute | Qualité ISRC, droits multi-territoires (Anchor, Gimlet, Parcast) | Informatica Data Quality |
-| **Payments** | Haute | PCI-DSS, audit annuel, Vormetric pour chiffrement | Vormetric + VeraSafe |
-| **Marketing** | Haute | CCPA opt-out, cohérence métriques conversion | OneTrust + Talend |
-| **Ads** | Moyenne | Ciblage comportemental, conformité CCPA | TrustArc |
-
-Pour chaque domaine : cartographie → règles qualité → intégration Airflow → DPIA si nécessaire → baseline qualité.
-
-**Critère de succès global** : 5 domaines dans Collibra, métriques qualité mesurées partout.
-
----
-
-### Phase 4 — Industrialisation (M9-M12)
-
-**Objectif** : passer en mode opérationnel continu, ancrer la culture data.
-
-| Action | Responsable | Livrable |
-|---|---|---|
-| Déployer Monte Carlo — data observability | Engineering | Alertes automatiques anomalies |
-| Déployer OpenLineage — lineage end-to-end | Engineers | Traçabilité dans Collibra |
-| Déployer Ataccama ONE — AI data quality | Engineers | Profiling automatisé |
-| Formation avancée par rôle | CoE + DPO | Formations Legal/Marketing/Product |
-| Cadence mensuelle Governance Committee | CDO | Comité opérationnel |
-| Premier audit conformité complet | DPO + Legal + Engineering | Rapport GDPR/CCPA/PCI-DSS |
-| Audit biais algorithmiques complet | Head of Engineering | Rapport EU AI Act |
-| Dashboard exécutif KPIs governance | CDO | Tableau de bord Board/CEO |
-| Révision annuelle du framework | CDO + DPO + Legal | Version 4.0 du framework |
-
----
-
-## 4. KPIs globaux de suivi
-
-| KPI | Cible | Fréquence | Propriétaire |
-|---|---|---|---|
-| Taux de complétude (tous domaines) | >98% (-10% missing data vs baseline) | Mensuel | Data Stewards |
-| Délai effacement GDPR | <30 jours | Mensuel | DPO + Privacy Team |
-| Notification violation données | <72 heures | Par incident | DPO |
-| Conformité consentements | 100% | Mensuel | DPO (OneTrust) |
-| Couverture catalogue Collibra | 100% des 5 domaines | Trimestriel | CoE |
-| Amélioration accès données | +20% vs baseline | Trimestriel | Head of Engineering |
-| Taux formation employés | >90% | Trimestriel | CoE |
-| Incidents data critiques | 0 | Mensuel | Head of Engineering (Splunk) |
-| Score biais algorithmiques | 0 biais critique | Trimestriel | Head of Engineering + DPO |
-| Délai réponse demandes CCPA | <45 jours | Mensuel | Privacy Team |
-
----
-
-## 5. Stratégie de change management
-
-| Levier | Action concrète | Timing |
-|---|---|---|
-| Sponsorship exécutif | CEO + CDO portent publiquement le programme | M1 |
-| Communication ciblée | Messages différenciés par rôle | M1-M2 |
-| Engagement précoce | Data Stewards impliqués dès la définition des règles | M1-M3 |
-| Formation pratique | Ateliers hands-on Collibra + Talend par département | M2-M4 |
-| Quick wins visibles | Résultats pilote User Data publiés en interne | M4-M5 |
-| Feedback loop | Canal de remontée terrain → ajustements CoE | Continu |
-
----
-
-## 6. Tableau de risques global
-
-| Risque | Probabilité | Impact | Mitigation |
-|---|---|---|---|
-| Résistance des squads | Haute | Moyen | Change management, sponsors CEO, quick wins M4 |
-| Coordination 180+ pays | Haute | Élevé | CoE + relais régionaux, OneTrust centralisé |
-| Dérive périmètre pilote | Moyenne | Moyen | Périmètre User Data borné, Go/No-Go M4 |
-| Complexité intégration Collibra/GCP | Moyenne | Élevé | POC technique M1, support vendor |
-| Évolutions réglementaires (EU AI Act) | Haute | Élevé | Veille DPO mensuelle, révision annuelle |
-| Biais algorithmiques non détectés | Moyenne | Très élevé | Audits trimestriels, fairness testing dans les pipelines ML |
-| Dépassement budgétaire | Moyenne | Moyen | Budget planning rigoureux, ajustements éléments non critiques |
-| Tension gouvernance/vélocité produit | Haute | Moyen | Privacy by design intégré dès les sprints |
-
----
-
-## 7. Timeline récapitulative
-
-```
-M1-M2  : ████████░░░░░░░░░░░░░░░░  Phase 1 — Fondations + change management
-M3-M4  : ░░░░████████░░░░░░░░░░░░  Phase 2 — Pilote User Data (Go/No-Go M4)
-M5-M8  : ░░░░░░░░████████████░░░░  Phase 3 — Généralisation (4 domaines)
-M9-M12 : ░░░░░░░░░░░░░░░░████████  Phase 4 — Industrialisation + culture data
-```
-
-**Pilot phase** : 2 mois (M3-M4) — conforme au Pilot Template officiel (3-6 mois)  
-**Full rollout** : 12 mois — conforme à l'Executive Q&A Guide (12-18 mois)  
-**Premier audit conformité complet** : M10  
-**Go-live opérationnel** : M12
+## 5. Ressources et budget (ordres de grandeur, hypothèses à affiner en phase 1)
+
+| Poste | Hypothèse | 18 mois |
+|--------------------------------------------------|------------------------------|--------------|
+| Personnel CoE (5 ETP) + Privacy Team (3 ETP) + 5 stewards à 50 % (2,5 ETP) | ≈ 10,5 ETP × 120 k€ chargés / an | ≈ 1,9 M€ |
+| Licences (catalogue, consentement, SIEM, chiffrement, observabilité) | 1,5 à 2,5 M€ / an | ≈ 3 M€ |
+| Intégration et conseil (setup, pipelines d'effacement, migration) | Forfait | 0,5 à 1 M€ |
+| Formation et communication | E-learning, ateliers, supports | ≈ 0,3 M€ |
+| **Total programme** | | **≈ 6 à 7 M€ sur 18 mois** |
+
+À comparer à l'exposition maximale GDPR (4 % de 13,25 Md€ ≈ **530 M€**), à la sanction déjà subie en 2023 (≈ 5 M€) et au gain d'efficacité : à titre d'hypothèse, 500 analystes et data scientists gagnant 2 h par semaine de recherche de données représentent ≈ 50 000 h/an, soit ≈ 25 ETP (≈ 3 M€/an).
+
+## 6. KPIs de suivi du programme
+
+| KPI | Cible | Owner |
+|----------------------------------------------------|------------------------------|--------------------|
+| Complétude des datasets critiques (tous domaines) | > 98 % (mensuel) | Data Stewards |
+| Demandes des personnes traitées dans le délai légal ; notification de violation | 100 %, effacement < 30 j ; < 72 h | DPO / Privacy Team |
+| Traitements avec base légale documentée | 100 % (trimestriel) | DPO |
+| Couverture du catalogue (classifié, owner, durée de conservation) | 100 % des 5 domaines à M12 | CoE |
+| Délai d'accès aux données ; employés formés | -20 % vs baseline ; > 90 % | CoE |
+| Incidents de données critiques ; audit des biais | 0 ; trimestriel, 0 biais critique | Head of Engineering + DPO |
+| Score de maturité | 3,4 → 4,2 à M12 (semestriel) | CDO |
+
+**Gouvernance du programme** : le Data Governance Committee est le comité de pilotage (Go/No-Go de chaque phase) ; le CDO rend compte trimestriellement au comité exécutif. Dépendances : nomination du CDO (M1) → tout le reste ; approbation du budget phases 1-2 avant M1 ; disponibilité des Data Engineers dès M1.
