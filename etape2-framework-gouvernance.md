@@ -1,216 +1,124 @@
-# Étape 2 — Framework de Data Governance : Spotify
-
-**Auteur** : Data Governance Specialist  
-**Date** : Mai 2026  
-**Version** : 3.0 (intégration Governance Principles Guide + Tech Tools Overview officiels)
-
+---
+title: "Data Governance Policy — Spotify"
+subtitle: "Politique de gouvernance des données"
+author: "Emeline ROBLOT — Data Governance Specialist"
+date: "Septembre 2026"
 ---
 
-## 1. Les 9 principes fondateurs (Governance Principles Guide officiel)
+| Owner | Approbation | Version | Date d'effet | Revue |
+|--------------|--------------------------|-------|------------------|------------------------------|
+| Chief Data Officer | Data Governance Committee, avis DPO et Legal | 1.0 | M1 du plan d'implémentation | Annuelle, ou à tout changement réglementaire majeur |
 
-| # | Principe | Description | Action concrète chez Spotify |
-|---|---|---|---|
-| 1 | **Accountability** | Responsabilité claire sur tous les processus data | Désigner Data Stewards et DPO avec fiches de rôle signées |
-| 2 | **Transparency** | Toutes les activités de traitement sont transparentes pour les utilisateurs | Privacy notices détaillées, consentement OneTrust sur 180 pays |
-| 3 | **Data Security** | Les données sensibles sont chiffrées et protégées selon les plus hauts standards | Chiffrement AES-256, contrôle d'accès RBAC, Splunk SIEM, PCI-DSS via Stripe |
-| 4 | **Data Quality** | Les données sont exactes, complètes et fiables | Métriques qualité + audits réguliers via Great Expectations ou Talend |
-| 5 | **Compliance** | Conformité avec GDPR, CCPA, PCI-DSS et réglementations locales | Revues de conformité trimestrielles, DPIAs systématiques |
-| 6 | **Data Minimization** | Ne collecter que les données nécessaires aux finalités définies | Politiques strictes de collecte, revue annuelle des datasets |
-| 7 | **User Rights** | Respecter et faciliter l'exercice des droits des utilisateurs | Pipeline d'effacement <30j, portabilité, opt-out CCPA, Privacy Team dédiée |
-| 8 | **Continuous Improvement** | Le framework évolue avec les réglementations, la technologie et les besoins | Révision annuelle du framework, feedback du Governance Committee |
-| 9 | **Ethical Use** | Usage éthique des données et des systèmes d'IA | Audits trimestriels des biais algorithmiques, conformité EU AI Act |
+## 1. Objet et champ d'application
 
----
+**Objet.** Cette politique définit comment Spotify gouverne ses données pour atteindre les quatre objectifs du business case : qualité des données, conformité réglementaire (GDPR, CCPA/CPRA, PCI-DSS, réglementations locales), protection de la vie privée, accessibilité et intégration des données entre départements.
 
-## 2. Pilier 1 — Qualité des données
+**Champ d'application.** Elle s'applique à tous les employés, prestataires et systèmes qui collectent, stockent, traitent ou partagent des données Spotify, dans les 180+ pays d'opération. Elle couvre les cinq domaines de données et leurs owners :
 
-### 2.1 Domaines de données et ownership
+| Domaine | Données | Data Steward | Criticité |
+|------------|--------------------------------------------|--------------|--------------------------|
+| **User Data** | Profils, historiques d'écoute, recherches, playlists, localisation | Steward User | Très haute — GDPR, recommandation |
+| **Content** | Métadonnées musicales et podcasts (ISRC, artistes, droits) | Steward Content | Haute — recommandation, royalties |
+| **Payments** | Abonnements, transactions, facturation | Steward Payments | Très haute — PCI-DSS |
+| **Ads** | Campagnes, ciblage, impressions, segments | Steward Ads | Haute — opt-out CCPA |
+| **Marketing** | Engagement, segmentation, conversion free → premium | Steward Marketing | Haute — croissance |
 
-| Domaine | Données concernées | Data Steward | Criticité |
-|---|---|---|---|
-| **User Data** | Profils, historiques d'écoute (titres joués, skips, recherches), playlists, localisation, démographie | Data Steward User | Très haute — GDPR + recommandation |
-| **Content** | Métadonnées musicales (ISRC, artiste, genre, droits), podcasts (Anchor, Gimlet, Parcast) | Data Steward Content | Haute — qualité recommandation + royalties |
-| **Payments** | Abonnements premium, transactions, historique de facturation (PCI-DSS via Stripe) | Data Steward Payments | Très haute — PCI-DSS |
-| **Ads** | Campagnes, ciblage, impressions, conversions, segments utilisateurs | Data Steward Ads | Haute — CCPA opt-out |
-| **Marketing** | Engagement campagnes, segmentation, métriques conversion free→premium | Data Steward Marketing | Haute — stratégie croissance |
+**Définitions.** *Donnée personnelle* : toute information relative à une personne identifiable (GDPR art. 4). *Donnée sensible* : catégories de l'art. 9 GDPR, y compris les informations **inférées** (humeur, convictions, santé déduites des écoutes). *Data Owner* : responsable métier d'un domaine. *Data Steward* : garant opérationnel de la qualité et de la conformité d'un domaine. *Traitement* : toute opération sur des données personnelles.
 
-### 2.2 Règles de qualité (4 critères officiels)
+## 2. Principes (Governance Principles Guide)
 
-| Critère | Définition | Cible | Outil de mesure |
-|---|---|---|---|
-| **Complétude** | Absence de champs obligatoires vides | >98% | Great Expectations / Talend |
-| **Exactitude** | Conformité aux valeurs attendues (ex. ISRC valide) | >99% | Informatica Data Quality |
-| **Cohérence** | Même définition d'une métrique sur tous les systèmes | 100% | Collibra (business glossary) |
-| **Fraîcheur** | Délai max entre production et disponibilité | <1h temps réel | Monte Carlo / Ataccama ONE |
+| # | Principe | Engagement Spotify |
+|---|------------------|---------------------------------------------------------------------------|
+| 1 | Accountability | Un owner et un steward nommés par domaine ; RACI publié |
+| 2 | Transparency | Privacy notice claire par finalité ; consentement granulaire ; information sur durées de conservation et transferts (point sanctionné par l'IMY en 2023) |
+| 3 | Data Security | Chiffrement, contrôle d'accès par rôle, SIEM, protocole d'incident |
+| 4 | Data Quality | 4 critères mesurés par domaine, audits réguliers |
+| 5 | Compliance | Revue trimestrielle ; checklist GDPR/CCPA/PCI-DSS tenue à jour (annexe) |
+| 6 | Data Minimization | Collecte limitée à la finalité ; revue annuelle des datasets et durées de conservation |
+| 7 | User Rights | Exercice des droits en libre-service et via la Privacy Team, dans les délais légaux |
+| 8 | Continuous Improvement | Revue annuelle de la politique, retours du Committee et des équipes |
+| 9 | Ethical Use | Audit des biais de recommandation, explicabilité, pas de profilage sur catégories sensibles inférées |
 
-### 2.3 Stack outils — Data Quality (Tech Tools Overview officiel)
+## 3. Qualité des données
 
-| Outil | Usage | Positionnement |
-|---|---|---|
-| **Talend** | Data integration, cleansing, déduplication | Principal — intégration GCP |
-| **Informatica Data Quality** | Profiling, cleansing, matching temps réel | Complémentaire — domaine Content |
-| **Ataccama ONE** | AI-powered data profiling, gouvernance automatisée | Avancé — scalabilité |
-| **Great Expectations** | Tests qualité dans les pipelines CI/CD (Airflow) | Open source — intégration existante |
+Chaque domaine mesure quatre critères, avec une baseline établie avant toute cible :
 
----
+| Critère | Définition | Cible | Mesure |
+|------------|------------------------------------|--------------------------|--------------------------|
+| Complétude | Champs obligatoires renseignés | > 98 % | Great Expectations dans les pipelines |
+| Exactitude | Conformité aux formats et référentiels (ex. ISRC valide) | > 99 % | Great Expectations |
+| Cohérence | Une seule définition par métrique (glossaire métier) | 100 % des métriques du glossaire | Catalogue de données |
+| Fraîcheur | Délai production → disponibilité | < 1 h pour les flux temps réel | Observabilité (phase 4) |
 
-## 3. Pilier 2 — Sécurité et conformité réglementaire
+Les Data Stewards publient les scores mensuellement au Data Governance Committee. Un dataset critique sous la cible deux mois de suite déclenche un plan de remédiation.
 
-### 3.1 GDPR (Union Européenne) — Risque : 20 M€ ou 4% du CA mondial
+## 4. Sécurité, classification, accès et cycle de vie
 
-| Exigence | Mise en œuvre | Responsable |
-|---|---|---|
-| Base légale (consentement) | Consentement explicite via OneTrust à l'inscription | DPO + Legal |
-| Droit à l'effacement | Pipeline automatisé déclenché sous **30 jours** | Engineering + DPO |
-| Droit à la portabilité | Export JSON/CSV depuis les paramètres du compte | Engineering |
-| Notification violation | Signalement autorités sous **72 heures** | DPO + Legal |
-| Privacy by design | Pseudonymisation dans les pipelines analytiques, data minimization | Data Engineers |
-| DPIA | Obligatoire avant tout nouveau traitement à risque élevé | DPO |
+**Classification** (obligatoire pour tout dataset catalogué) :
 
-### 3.2 CCPA (Californie)
+| Classe | Exemples | Protection minimale |
+|------------|----------------------------------|--------------------------------------------------|
+| Publique | Catalogue musical | Aucune restriction |
+| Interne | Métriques business, rapports | Employés authentifiés |
+| Confidentielle | Historiques d'écoute, profils, segments | Chiffrement au repos et en transit, accès par rôle, pseudonymisation pour l'analytics |
+| Sensible | Paiements, données inférées art. 9, mineurs | Chiffrement renforcé, accès nominatif minimal, journalisation obligatoire, DPIA |
 
-| Exigence | Mise en œuvre |
-|---|---|
-| Opt-out | Lien "Do Not Sell My Personal Information" visible sur site et app |
-| Droit d'accès | Réponse sous 45 jours (Privacy Team dédiée) |
-| Non-discrimination | Aucun service dégradé pour les utilisateurs ayant exercé leurs droits |
+**Accès et partage.** L'accès se demande via le catalogue de données, il est accordé par le Data Steward du domaine selon la classe et le besoin (principe du moindre privilège), et il est revu trimestriellement. Le partage inter-départements se fait sur données **pseudonymisées ou agrégées par défaut** ; l'accès aux données identifiantes exige une finalité documentée. Aucun export de données confidentielles ou sensibles hors des plateformes gouvernées.
 
-### 3.3 PCI-DSS
+**Cycle de vie (POSMAD : Plan, Obtain, Store & Share, Maintain, Apply, Dispose).** Chaque dataset a une durée de conservation définie par son steward avec le DPO et inscrite au catalogue. Repères initiaux : logs d'écoute bruts identifiants 13 mois puis agrégation, données de compte pendant la relation contractuelle + délais légaux, données de paiement selon obligations comptables (sans stockage de numéro de carte chez Spotify), données marketing jusqu'au retrait du consentement. À échéance : suppression ou anonymisation irréversible.
 
-Données de paiement traitées exclusivement par Stripe (certifié PCI-DSS). Obligations Spotify : TLS 1.2+, audit annuel, logs d'accès 12 mois minimum.
+**Sécurité opérationnelle.** Chiffrement systématique des classes Confidentielle et Sensible ; authentification forte ; journalisation centralisée dans le SIEM ; protocole d'incident piloté par le DPO (qualification sous 24 h, notification autorité sous 72 h, information des personnes si risque élevé) ; exercice annuel.
 
-### 3.4 Réglementations régionales
+## 5. Conformité réglementaire
 
-| Pays | Réglementation | Point de vigilance |
-|---|---|---|
-| UE | GDPR | Transferts hors UE (clauses contractuelles types) |
-| USA/CA | CCPA | Opt-out publicité ciblée |
-| Singapour | PDPA | Consentement + notification violations |
-| Brésil | LGPD | Base légale explicite, amende 2% CA Brésil |
+**Bases légales par finalité (GDPR art. 6).** Fourniture du service et facturation → **contrat** ; recommandation et personnalisation du service → **intérêt légitime ou contrat**, avec option de recommandation non fondée sur le profilage (DSA art. 27) ; publicité ciblée, partage à des tiers, features optionnelles → **consentement** explicite et révocable ; obligations comptables et fiscales → **obligation légale**. Chaque traitement est inscrit au registre des traitements (art. 30) tenu par le DPO.
 
-### 3.5 Stack outils — Compliance (Tech Tools Overview officiel)
+**Droits des personnes.**
 
-| Outil | Usage |
-|---|---|
-| **OneTrust** | Gestion consentements (180 pays), data mapping, DPIAs, reporting GDPR/CCPA |
-| **TrustArc** | Inventaire des données, gestion complémentaire de la conformité |
-| **VeraSafe** | Audits de conformité GDPR/CCPA, gestion des incidents |
+| Droit | Base | Délai | Mise en œuvre |
+|------------------------------|--------------------|------------|------------------------------------|
+| Accès et information (source, destinataires, durées, transferts) | GDPR art. 15, CCPA | 1 mois / 45 j | Export libre-service complet ; Privacy Team pour le reste |
+| Rectification | GDPR art. 16, CPRA | 1 mois | Paramètres du compte |
+| Effacement | GDPR art. 17, CCPA | 1 mois | Pipeline automatisé sur tous les systèmes du domaine |
+| Portabilité | GDPR art. 20 | 1 mois | Export JSON/CSV |
+| Opposition et limitation | GDPR art. 18, 21 | 1 mois | Désactivation du profilage publicitaire, gel du traitement |
+| Décision automatisée | GDPR art. 22, DSA art. 27 | — | Explicabilité des recommandations, option non profilée |
+| Opt-out de la vente / du partage | CCPA/CPRA | Immédiat | Lien « Do Not Sell or Share », signal GPC honoré |
+| Non-discrimination | CCPA | — | Aucune dégradation de service après exercice d'un droit |
 
-### 3.6 Stack outils — Data Security (Tech Tools Overview officiel)
+**Consentement et transparence.** Consentement recueilli et tracé par la plateforme de gestion des consentements, granulaire par finalité, aussi simple à retirer qu'à donner. Mineurs : âge minimum par pays, consentement parental (GDPR art. 8), pas de publicité ciblée.
 
-| Outil | Usage |
-|---|---|
-| **Splunk** | SIEM — visibilité temps réel sur les risques et incidents de sécurité |
-| **DataGuard** | Automation de la protection des données, reporting GDPR/CCPA |
-| **Vormetric** | Chiffrement des données sensibles dans les bases, fichiers et applications |
+**DPIA.** Obligatoire avant tout nouveau traitement à risque élevé (nouveau profilage, nouvelle catégorie de données, nouveau transfert), validée par le DPO avant mise en production.
 
-### 3.7 Classification des données
+**Transferts internationaux.** Clauses contractuelles types, EU-US Data Privacy Framework pour les prestataires certifiés, règles d'entreprise contraignantes intra-groupe ; inventaire des transferts au registre.
 
-| Classe | Exemples Spotify | Protection |
-|---|---|---|
-| Publique | Métadonnées musicales catalogue | Aucune restriction |
-| Interne | Métriques business, rapports campagnes | Accès employés uniquement |
-| Confidentielle | Historiques d'écoute, comportements utilisateurs | Chiffrement AES-256, RBAC |
-| Sensible | Paiements, données révélant opinions/santé implicite | Chiffrement renforcé (Vormetric), accès minimal, logs Splunk obligatoires |
+**PCI-DSS.** Les données de carte sont traitées par un prestataire de paiement certifié PCI-DSS ; Spotify ne stocke aucun numéro de carte (tokenisation). Obligations conservées par Spotify sur les six exigences de la checklist : réseau et page de paiement sécurisés (SAQ-A annuel), protection des jetons et données de facturation, gestion des vulnérabilités (scans trimestriels, correctifs), contrôle d'accès strict et MFA sur les consoles de paiement, surveillance et tests (SIEM, pentest annuel), politique de sécurité de l'information revue annuellement.
 
-### 3.8 Éthique algorithmique (Principe 9 — Ethical Use)
+**Réglementations locales.** CCPA/CPRA (Californie), PDPA (Singapour), LGPD (Brésil, amende jusqu'à 2 % du CA local), DSA (transparence des systèmes de recommandation), AI Act (obligations de transparence pour les systèmes de recommandation). La veille est tenue par le DPO et Legal ; la checklist de conformité (annexe Excel) est mise à jour trimestriellement.
 
-Conformément au Governance Principles Guide et à l'EU AI Act :
-- Audits trimestriels des biais du moteur de recommandation (Discover Weekly, Daily Mix)
-- Explicabilité des recommandations disponible sur demande utilisateur
-- Lignes directrices éthiques intégrées à tous les projets de développement IA
-- Surveillance des systèmes de décision automatisée pour prévenir les discriminations
+## 6. Rôles et responsabilités
 
----
+Les rôles suivent le Data Governance Roles Template ; l'organigramme et les fiches détaillées font l'objet d'un livrable séparé.
 
-## 4. Pilier 3 — Rôles et responsabilités
+- **Chief Data Officer** — porte la stratégie et cette politique, pilote le Centre of Excellence, arbitre les conflits inter-domaines.
+- **Data Protection Officer** — indépendant, rattaché à la direction générale ; conformité GDPR/CCPA, DPIA, registre, contact des autorités, pilotage des incidents ; dirige la Privacy Team.
+- **Data Governance Committee** (mensuel) — approuve les politiques et standards, traite les sujets inter-départements, suit les KPIs.
+- **Data Stewards** (un par domaine) — qualité, classification, accès et conformité de leur domaine.
+- **Parties prenantes** — Head of Engineering (implémentation technique des contrôles, sous l'autorité du CTO : la gouvernance définit et audite, l'engineering met en œuvre), Legal (validation juridique), Marketing Director et Product Managers (conformité et privacy by design de leurs périmètres).
 
-### 4.1 Rôles officiels (Data Governance Roles Template)
+**RACI des activités clés** (A = rend compte, R = réalise, C = consulté, I = informé) :
 
-**Data Steward** (×5 — un par domaine)
-- Garantir l'exactitude, la cohérence et la fiabilité des données du domaine
-- Collaborer avec les équipes techniques pour implémenter les améliorations qualité
-- Faire respecter les politiques de gouvernance et gérer les accès données
+| Activité | CDO | DPO | Head Eng. | Legal | Steward | Engineers | PM / Mktg |
+|------------------------------------|:----:|:----:|:------:|:-----:|:------:|:-------:|:-------:|
+| Définir et réviser la politique | A/R | C | C | C | C | I | C |
+| Valider un nouveau traitement (DPIA) | I | A/R | C | C | R | I | R |
+| Qualité et classification d'un domaine | I | C | C | I | A/R | R | C |
+| Implémenter contrôles et pipelines | I | C | A/R | I | C | R | I |
+| Traiter les demandes des personnes | I | A | C | C | R | R | I |
+| Gérer un incident de données personnelles | C | A/R | R | C | C | R | I |
+| Auditer les biais de recommandation | C | A | R | C | C | R | C |
+| Former et animer la culture data | A/R | R | C | I | R | I | C |
 
-**Data Protection Officer (DPO)**
-- Assurer la conformité avec GDPR, CCPA et toutes réglementations applicables
-- Point de contact avec les autorités de protection des données (CNIL, etc.)
-- Conseiller sur les DPIAs
-- Superviser les processus de réponse aux violations et de notification
+## 7. Application, exceptions et suivi
 
-**Chief Data Officer (CDO)**
-- Diriger la stratégie de gouvernance data de Spotify
-- Définir les politiques data et s'assurer de leur application
-- Aligner la gouvernance avec les priorités business (CEO, Board)
-- Piloter le Data Governance CoE
-
-**Data Governance Committee** (mensuel)
-- Réviser et approuver les politiques et processus data
-- Traiter les challenges de gouvernance cross-départementaux
-- Assurer l'alignement avec les objectifs légaux, de conformité et opérationnels
-
-### 4.2 Parties prenantes étendues
-
-| Rôle | Responsabilité dans la gouvernance |
-|---|---|
-| **Head of Engineering** | Infrastructure data, sécurité technique, pipelines, scalabilité GCP |
-| **Marketing Director** | Conformité des pratiques marketing, qualité données campagnes |
-| **Legal Team** | Validation juridique des politiques, gestion des risques légaux |
-| **Product Managers** | Privacy by design sur chaque nouvelle feature |
-
-### 4.3 Matrice RACI
-
-| Activité | CDO | DPO | Head Eng. | Mktg Dir. | Legal | PM | Steward | Engineer |
-|---|---|---|---|---|---|---|---|---|
-| Définir la politique de gouvernance | R | C | C | C | C | I | C | I |
-| Valider les traitements / DPIAs | I | R | I | C | C | I | C | I |
-| Garantir la qualité par domaine | C | I | C | C | I | C | R | C |
-| Implémenter pipelines & sécurité | I | I | R | I | I | I | C | R |
-| Traiter demandes utilisateurs GDPR | I | R | C | I | C | I | C | C |
-| Audits algorithmes / biais IA | C | C | R | I | C | C | C | R |
-| Formation & culture data | R | C | C | C | I | C | C | I |
-| Répondre aux incidents data | R | C | R | I | C | I | C | R |
-
-*R = Responsable, C = Consulté, I = Informé*
-
----
-
-## 5. Pilier transversal — Culture data et formation (Principe 8)
-
-Conformément au Governance Principles Guide (Continuous Improvement) :
-- **Programme de formation par rôle** : DPO → conformité GDPR/CCPA ; CoE → qualité data ; Product → privacy by design
-- **Data Governance Committee mensuel** : CDO + DPO + Head of Engineering + Marketing Director + Legal + 5 Stewards + représentant Product
-- **Privacy Team dédiée** (rattachée au DPO) : 1 DPO + 2 Privacy Analysts pour traiter les demandes utilisateurs dans les délais légaux
-- **Newsletter data mensuelle** : métriques qualité, incidents, veille réglementaire
-- **Revue annuelle du framework** : intégration des nouvelles réglementations et feedbacks terrain
-
----
-
-## 6. Stack catalogue — Data Cataloging (Tech Tools Overview officiel)
-
-| Outil | Usage | Recommandation |
-|---|---|---|
-| **Collibra** | Data stewardship, cataloging, qualité — interface métier | **Retenu** — meilleure intégration GCP et interface non-tech |
-| **Alation** | Data discovery, collaboration, catalogue | Alternative si budget contraint |
-| **Apache Atlas** | Open source, tracking et cataloging metadata | Backup open source |
-
----
-
-## 7. Synthèse du framework
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│              DATA GOVERNANCE FRAMEWORK — SPOTIFY v3.0            │
-├──────────────┬───────────────────┬────────────┬──────────────────┤
-│  QUALITÉ     │   CONFORMITÉ      │   RÔLES    │  CULTURE         │
-│              │                   │            │                  │
-│ 5 domaines   │ GDPR 20M€ max     │ CDO        │ 9 principes      │
-│ 4 critères   │ CCPA · PCI-DSS    │ DPO        │ Formation rôles  │
-│ Talend       │ PDPA · LGPD       │ 5 Stewards │ Committee mensuel│
-│ Informatica  │ EU AI Act         │ Head Eng.  │ Privacy Team     │
-│ Great Exp.   │ OneTrust          │ Legal      │ Révision annuelle│
-│              │ Splunk · Vormetric│ Product    │                  │
-└──────────────┴───────────────────┴────────────┴──────────────────┘
-```
-
-Déploiement prioritaire sur le domaine **User Data** (voir Étape 3 — Plan d'implémentation).
+Le respect de cette politique est une obligation professionnelle ; les manquements sont traités selon les procédures RH et peuvent entraîner le retrait des accès. Toute exception est demandée par écrit au Data Steward, validée par le CDO (et le DPO si des données personnelles sont concernées), limitée dans le temps et consignée. Le CDO rend compte trimestriellement au comité exécutif des KPIs de gouvernance (qualité, délais de réponse aux droits, incidents, couverture du catalogue, formation). La politique est revue chaque année ; la version 1.0 est déployée d'abord sur le domaine User Data (voir plan d'implémentation).
