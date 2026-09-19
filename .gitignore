@@ -21,3 +21,6 @@ Thumbs.db
 
 # Documents de travail soutenance (internes)
 docs/
+
+# Intermédiaire de build
+build/_plan-de-gouvernance.md

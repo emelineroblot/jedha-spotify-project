@@ -3,7 +3,16 @@
 Projet Jedha (6 h) : concevoir et piloter un framework de Data Governance pour Spotify, conforme GDPR, CCPA/CPRA et PCI-DSS.
 Auteur : Emeline ROBLOT — Data Governance Specialist · Septembre 2026.
 
-## Livrables (`livrables/`)
+## Les deux fichiers à déposer
+
+| Livrable attendu | Fichier | Contenu |
+|---|---|---|
+| **Le plan de gouvernance** (Word) | `livrables/00-plan-de-gouvernance.docx` / `.pdf` | Document unique, 15 pages : synthèse exécutive, Partie 1 maturité, Partie 2 policy, Partie 3 organisation, Partie 4 plan & pilote, annexes checklist et sources |
+| **La présentation du plan résumé** (PowerPoint) | `livrables/04-presentation-executive.pptx` / `.pdf` | 9 slides + annexes Q&A, notes orateur |
+
+## Livrables détaillés par étape (`livrables/`)
+
+Les parties du plan de gouvernance existent aussi en fichiers séparés, aux formats et longueurs de l'énoncé détaillé :
 
 | Étape | Livrable énoncé | Fichier | Format |
 |---|---|---|---|
@@ -39,6 +48,7 @@ Prérequis : `pandoc` dans le PATH, Microsoft Word et PowerPoint installés (exp
 | `build/generate_checklist.py` | Remplit la Compliance Checklist officielle → `livrables/02-compliance-checklist.xlsx` |
 | `build/generate_docx.py` | Markdown → docx (pandoc), mise en forme et pied de page (Word), export PDF, contrôle du nombre de pages |
 | `build/generate_pptx.py` | Deck executive + organigramme (python-pptx), export PDF (PowerPoint) |
+| `build/generate_plan.py` | Assemble le plan de gouvernance unique (parties depuis les .md, organigramme en image, checklist en annexe), sommaire automatique, PDF |
 
 ## Décisions clés
 

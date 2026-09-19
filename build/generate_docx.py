@@ -71,7 +71,7 @@ def pandoc(src: Path, dst: Path):
     )
 
 
-def polish(word, pid: int, path: Path, max_pages: int) -> int:
+def polish(word, pid: int, path: Path, max_pages: int, toc: bool = False) -> int:
     doc = word.Documents.Open(str(path))
     dismiss_dialogs(pid)
     try:
@@ -87,15 +87,17 @@ def polish(word, pid: int, path: Path, max_pages: int) -> int:
         normal.ParagraphFormat.SpaceAfter = 4
         normal.ParagraphFormat.SpaceBefore = 0
         normal.ParagraphFormat.LineSpacingRule = 0  # single
-        for name, size, color in (("Title", 20, 0x54B91D), ("Subtitle", 12, 0x8A8A8A),
-                                  ("Heading 1", 13, 0x54B91D), ("Heading 2", 11, 0x141419)):
+        # styles intégrés par constante (les noms sont localisés : « Titre 1 » en français)
+        for name, size, color in ((-63, 20, 0x54B91D), (-75, 12, 0x8A8A8A),      # Title, Subtitle
+                                  (-2, 16, 0x54B91D), (-3, 12, 0x141419),        # Heading 1, 2
+                                  (-4, 11, 0x141419)):                           # Heading 3
             try:
                 st = doc.Styles(name)
                 st.Font.Name = "Calibri"
                 st.Font.Size = size
                 st.Font.Bold = True
                 st.Font.Color = color  # BGR
-                st.ParagraphFormat.SpaceBefore = 8 if name.startswith("Heading") else 0
+                st.ParagraphFormat.SpaceBefore = 8 if name in (-2, -3, -4) else 0
                 st.ParagraphFormat.SpaceAfter = 3
             except Exception:
                 pass
@@ -131,6 +133,15 @@ def polish(word, pid: int, path: Path, max_pages: int) -> int:
         for shp in doc.InlineShapes:
             shp.Range.ParagraphFormat.Alignment = 1  # wdAlignParagraphCenter
             shp.Range.ParagraphFormat.SpaceAfter = 2
+        # sommaire automatique à la place du marqueur [[TOC]] (document consolidé)
+        if toc:
+            doc.Styles(-2).ParagraphFormat.PageBreakBefore = True  # wdStyleHeading1
+            for para in doc.Paragraphs:
+                if para.Range.Text.strip() == "[[TOC]]":
+                    rng = para.Range
+                    rng.Text = ""
+                    doc.TablesOfContents.Add(rng, True, 1, 2)  # UseHeadingStyles, niveaux 1-2
+                    break
         # pied de page numéroté
         footer = doc.Sections(1).Footers(1)  # wdHeaderFooterPrimary
         rng = footer.Range
