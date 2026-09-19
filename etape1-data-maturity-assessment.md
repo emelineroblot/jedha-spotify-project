@@ -19,7 +19,7 @@ Le signal le plus concret : en juin 2023, l'autorité suédoise (IMY) a sanction
 ## 2. Évaluation par dimension
 
 | Dimension | Actuel | Cible M12 | Forces | Faiblesses | Plan d'action |
-|--------------|:---:|:---:|----------------------|----------------------------|----------------------|
+|--------------|:-----:|:-----:|----------------------|----------------------------|----------------------|
 | **Data Governance** | **2** | 4 | Besoin identifié, DPO en place (hyp.) | Pas de CDO ni d'équipe transverse ; chaque département gère ses datasets (business case) ; définitions de métriques divergentes | Nommer un CDO, créer un Centre of Excellence, désigner 5 Data Stewards |
 | **Data Quality** | 3 | 4 | Validation sur les pipelines critiques (recommandation) | Métadonnées de contenu incomplètes côté labels/distributeurs indépendants (hyp.) ; pas de métriques qualité partagées | Déployer Great Expectations, 4 critères qualité par domaine, baseline mesurée |
 | **Data Architecture** | 5 | 5 | GCP/BigQuery, data lakes, traitement temps réel | Systèmes hérités des acquisitions podcast (Anchor, Gimlet, Parcast) | Standardiser les pipelines des acquisitions |
